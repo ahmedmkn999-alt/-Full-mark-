@@ -1,19 +1,12 @@
 const express = require('express');
-const helmet = require('helmet');
-const cors = require('cors');
-
 const app = express();
 
-app.set('trust proxy', 1);
-app.use(helmet({ contentSecurityPolicy: false }));
-app.use(cors());
 app.use(express.json());
 
-// API سحب البيانات 
+// API سحب البيانات (متأمن ومتبسط جداً)
 app.get('/api/scrape', async (req, res) => {
     try {
         const response = await fetch('https://thanwyaplus.vercel.app/organized_output.json');
-        if (!response.ok) throw new Error('Network response failed');
         const data = await response.json();
         res.status(200).json(data);
     } catch (error) {
@@ -22,7 +15,7 @@ app.get('/api/scrape', async (req, res) => {
     }
 });
 
-// الصفحة الرئيسية للمنصة (الـ 7 مستويات والسينما مود)
+// الصفحة الرئيسية للمنصة (بالسينما مود والـ 7 مستويات)
 app.get('/', (req, res) => {
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.send(`
@@ -290,4 +283,7 @@ app.get('/', (req, res) => {
                     const wrapper = document.getElementById('playerWrapper');
                     modal.classList.remove('active');
                     wrapper.innerHTML = ''; 
-          
+                }
+
+                document.onkeydown = function(e) {
+                    if(e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 67 || e.keyCode == 74)) || (e.ctrlKey && e.key
