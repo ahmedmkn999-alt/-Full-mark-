@@ -2,9 +2,13 @@
   "name": "full-mark-platform",
   "version": "1.0.0",
   "description": "منصة تعليمية",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.18.2",
     "helmet": "^7.1.0"
   }
 }
+ج
