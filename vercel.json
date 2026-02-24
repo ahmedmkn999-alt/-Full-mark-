@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/fetch-data",
+      "destination": "https://thanwyaplus.vercel.app/organized_output.json"
+    }
+  ]
+}
