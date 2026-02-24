@@ -1,8 +1,8 @@
 {
   "rewrites": [
     {
-      "source": "/(.*)",
-      "destination": "/api/index.js"
+      "source": "/api/data",
+      "destination": "https://thanwyaplus.vercel.app/organized_output.json"
     }
   ]
 }
