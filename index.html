@@ -41,6 +41,9 @@
         .time-box span { display: block; font-size: 1.3em; font-weight: bold; color: white; text-shadow: 0 0 10px var(--glow); }
         .time-box label { font-size: 0.7em; color: var(--icy-green); display: block; margin-top: 3px; }
 
+        .logout-btn { display: block; width: 100%; margin-top: 30px; padding: 12px; background: rgba(255, 77, 77, 0.1); border: 1px solid #ff4d4d; color: #ff4d4d; border-radius: 10px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .logout-btn:hover { background: #ff4d4d; color: white; box-shadow: 0 0 15px rgba(255,77,77,0.5); }
+
         .controls-bar { max-width: 1300px; margin: 20px auto 0; padding: 0 40px; display: flex; align-items: center; gap: 20px; }
         .back-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(168,255,210,0.3); color: var(--icy-green); padding: 10px 20px; border-radius: 30px; cursor: pointer; display: flex; align-items: center; gap: 10px; font-weight: bold; transition: 0.3s; backdrop-filter: blur(5px); }
         .back-btn:hover { background: var(--glow); color: #05130d; transform: translateX(5px); }
@@ -110,7 +113,7 @@
     <div class="controls-bar" id="controls-bar"></div>
     <div id="main-content">
         <div class="loading-container" id="loadingBox">
-            <div class="loading-text"><i class="fas fa-spinner fa-spin"></i> جاري سحب البيانات بشكل آمن... ⏳</div>
+            <div class="loading-text"><i class="fas fa-spinner fa-spin"></i> جاري عرض البيانات... ⏳</div>
         </div>
     </div>
 
@@ -121,7 +124,6 @@
     </div>
 
     <script>
-        // النجوم
         const starsContainer = document.getElementById('stars');
         for(let i=0; i<80; i++) {
             let star = document.createElement('div'); star.className = 'star';
@@ -133,7 +135,6 @@
 
         function toggleProfile() { document.getElementById('profileSidebar').classList.toggle('open'); }
 
-        // العداد
         const countDownDate = new Date("Jun 1, 2026 00:00:00").getTime();
         setInterval(function() {
             const now = new Date().getTime();
@@ -152,16 +153,12 @@
         const controlsBar = document.getElementById('controls-bar');
         let historyStack = [];
 
-        // 🔴 هنا السحر: السحب بيتم من السيرفر الأصلي بتاعنا مباشرة وبدون بروكسي
+        // السحر هنا: بنطلب الداتا من السيرفر بتاعنا اللي عملناه في الخطوة الأولى
         fetch('/api/data')
-            .then(res => {
-                if(!res.ok) throw new Error("Network response was not ok");
-                return res.json();
-            })
+            .then(res => res.json())
             .then(data => { renderView(data, 0, "الرئيسية"); })
             .catch(err => { 
-                mainContent.innerHTML = '<h3 style="text-align:center; color:#ff4d4d;">حدث خطأ في السحب.. برجاء إعادة تحديث الصفحة!</h3>'; 
-                console.error("Fetch error:", err);
+                mainContent.innerHTML = '<h3 style="text-align:center; color:#ff4d4d;">حدث خطأ! برجاء تحديث الصفحة.</h3>'; 
             });
 
         function renderView(dataObject, currentDepth, currentTitle) {
