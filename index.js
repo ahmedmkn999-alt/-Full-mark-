@@ -4,24 +4,27 @@ const cors = require('cors');
 
 const app = express();
 
+app.set('trust proxy', 1);
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(cors());
 app.use(express.json());
 
-// API لسحب البيانات (بدون مشاكل)
+// API سحب البيانات (متأمن ضد الكراش)
 app.get('/api/scrape', async (req, res) => {
     try {
         const response = await fetch('https://thanwyaplus.vercel.app/organized_output.json');
+        if (!response.ok) throw new Error('Network response failed');
         const data = await response.json();
-        res.json(data);
+        res.status(200).json(data);
     } catch (error) {
-        console.error("Scrape Error:", error);
+        console.error("Fetch Error:", error);
         res.status(500).json({ error: 'خطأ في سحب البيانات' });
     }
 });
 
-// الصفحة الرئيسية للمنصة
+// الصفحة الرئيسية للمنصة (الـ 7 مستويات والسينما مود)
 app.get('/', (req, res) => {
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.send(`
         <!DOCTYPE html>
         <html dir="rtl">
@@ -286,8 +289,4 @@ app.get('/', (req, res) => {
                     const modal = document.getElementById('cinemaModal');
                     const wrapper = document.getElementById('playerWrapper');
                     modal.classList.remove('active');
-                    wrapper.innerHTML = ''; 
-                }
-
-                document.onkeydown = function(e) {
-                    if(e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 67 || e.keyCode == 74))
+                    wrapper.innerHTML 
