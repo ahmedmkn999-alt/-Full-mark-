@@ -5,6 +5,9 @@ const cors = require('cors');
 
 const app = express();
 
+// السطر ده مهم جداً جداً عشان Vercel متعملش Crash (Error 500)
+app.set('trust proxy', 1);
+
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(cors());
 app.use(express.json());
@@ -24,6 +27,7 @@ app.get('/api/scrape', async (req, res) => {
         const data = await response.json();
         res.json(data);
     } catch (error) {
+        console.error("Scrape Error:", error);
         res.status(500).json({ error: 'خطأ في سحب البيانات' });
     }
 });
@@ -47,13 +51,12 @@ app.get('/', (req, res) => {
                 .star { position: absolute; background: white; border-radius: 50%; box-shadow: 0 0 5px white; animation: floatUp linear infinite; }
                 @keyframes floatUp { 0% { opacity: 0; transform: translateY(100px) scale(0.5); } 50% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-100px) scale(0.5); } }
                 
-                /* الهيدر (Navbar) */
+                /* الهيدر */
                 nav { display: flex; justify-content: space-between; align-items: center; padding: 15px 40px; background: rgba(5, 19, 13, 0.8); backdrop-filter: blur(15px); border-bottom: 1px solid rgba(168, 255, 210, 0.2); position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 20px rgba(0, 255, 136, 0.1); }
                 .brand { display: flex; flex-direction: column; }
                 .brand h1 { color: var(--icy-green); text-shadow: 0 0 10px var(--glow); margin: 0; font-size: 1.8em; letter-spacing: 1px; }
                 .brand span { color: #d1f2e0; font-size: 0.8em; opacity: 0.8; }
                 
-                /* زر البروفايل */
                 .profile-trigger { width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--icy-green); cursor: pointer; overflow: hidden; transition: 0.3s; box-shadow: 0 0 10px rgba(0,255,136,0.3); }
                 .profile-trigger:hover { transform: scale(1.1); box-shadow: 0 0 20px var(--glow); }
                 .profile-trigger img { width: 100%; height: 100%; object-fit: cover; }
@@ -71,7 +74,7 @@ app.get('/', (req, res) => {
                 .stat-box { background: var(--card-bg); padding: 15px; border-radius: 12px; border: 1px solid rgba(168,255,210,0.1); display: flex; align-items: center; justify-content: space-between; }
                 .stat-box i { color: var(--glow); font-size: 1.5em; }
 
-                /* العداد التنازلي داخل البروفايل */
+                /* العداد التنازلي */
                 .countdown-wrapper { margin-top: 25px; text-align: center; background: rgba(0, 255, 136, 0.05); padding: 15px; border-radius: 15px; border: 1px solid rgba(168,255,210,0.15); box-shadow: 0 0 15px rgba(0,255,136,0.05); }
                 .countdown-title { color: #d1f2e0; font-size: 0.9em; margin-bottom: 15px; font-weight: bold; }
                 .timer { display: flex; justify-content: center; gap: 8px; direction: ltr; }
@@ -82,14 +85,14 @@ app.get('/', (req, res) => {
                 .logout-btn { display: block; width: 100%; margin-top: 30px; padding: 12px; background: rgba(255, 77, 77, 0.1); border: 1px solid #ff4d4d; color: #ff4d4d; border-radius: 10px; cursor: pointer; font-weight: bold; transition: 0.3s; }
                 .logout-btn:hover { background: #ff4d4d; color: white; box-shadow: 0 0 15px rgba(255,77,77,0.5); }
 
-                /* مسار التصفح وزر الرجوع */
+                /* مسار التصفح */
                 .controls-bar { max-width: 1300px; margin: 20px auto 0; padding: 0 40px; display: flex; align-items: center; gap: 20px; }
                 .back-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(168,255,210,0.3); color: var(--icy-green); padding: 10px 20px; border-radius: 30px; cursor: pointer; display: flex; align-items: center; gap: 10px; font-weight: bold; transition: 0.3s; backdrop-filter: blur(5px); }
                 .back-btn:hover { background: var(--glow); color: #05130d; transform: translateX(5px); }
                 .breadcrumb { color: #aaa; font-size: 1.1em; display:flex; align-items:center; gap: 10px;}
                 .breadcrumb span { color: white; font-weight: bold; }
 
-                /* شبكة الكروت (7 مستويات) */
+                /* شبكة الكروت */
                 .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; padding: 30px 40px 60px; max-width: 1300px; margin: auto; }
                 .card { background: var(--card-bg); backdrop-filter: blur(15px); border: 1px solid rgba(168, 255, 210, 0.15); border-radius: 20px; padding: 15px; text-align: center; transition: all 0.4s ease; cursor: pointer; position: relative; overflow: hidden;}
                 .card:hover { transform: translateY(-8px); border-color: var(--icy-green); box-shadow: 0 10px 30px rgba(0, 255, 136, 0.15); }
@@ -98,7 +101,7 @@ app.get('/', (req, res) => {
                 .card h3 { color: var(--icy-green); font-size: 1.3em; margin: 5px 0; }
                 .card p.sub { color: #d1f2e0; font-size: 0.9em; margin: 0; background: rgba(0,255,136,0.1); padding: 5px; border-radius: 5px;}
 
-                /* مشغل الفيديو العالمي (Cinema Modal) */
+                /* مشغل الفيديو السينمائي */
                 .cinema-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(10px); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: 0.3s; }
                 .cinema-modal.active { opacity: 1; pointer-events: all; }
                 .cinema-close { position: absolute; top: 30px; right: 40px; font-size: 2.5em; color: white; cursor: pointer; transition: 0.3s; }
@@ -159,7 +162,6 @@ app.get('/', (req, res) => {
             </div>
 
             <script>
-                // النجوم
                 const starsContainer = document.getElementById('stars');
                 for(let i=0; i<80; i++) {
                     let star = document.createElement('div'); star.className = 'star';
@@ -181,9 +183,6 @@ app.get('/', (req, res) => {
                     document.getElementById("secs").innerText = Math.floor((distance % (1000 * 60)) / 1000).toString().padStart(2, '0');
                 }, 1000);
 
-                // ==========================================
-                // الترتيب العالمي للبيانات (7 مستويات)
-                // ==========================================
                 const levelNames = ["السنة الدراسية", "المواد", "المدرسين", "الكورسات", "المحاضرات", "تقسيم المحاضرة", "الفيديوهات"];
                 const levelActions = ["اضغط لفتح المواد", "اضغط لفتح المدرسين", "اضغط لفتح الكورسات", "اضغط لفتح المحاضرات", "اضغط لفتح الأقسام", "اضغط لفتح الفيديوهات", "شاهد المحاضرة الآن"];
                 const levelIcons = ["fa-calendar-alt", "fa-book", "fa-chalkboard-teacher", "fa-layer-group", "fa-chalkboard", "fa-list-ol", "fa-play-circle"];
@@ -201,7 +200,6 @@ app.get('/', (req, res) => {
                     mainContent.innerHTML = ''; 
                     controlsBar.innerHTML = '';
 
-                    // زر الرجوع والمسار (Breadcrumb)
                     if (historyStack.length > 0) {
                         const backBtn = document.createElement('button');
                         backBtn.className = 'back-btn';
@@ -222,7 +220,6 @@ app.get('/', (req, res) => {
                     grid.className = 'grid-container';
                     mainContent.appendChild(grid);
 
-                    // استخراج العناصر الذكي
                     let items = [];
                     if (Array.isArray(dataObject)) {
                         items = dataObject.map((val, idx) => ({ key: val.title || val.name || \`عنصر \${idx+1}\`, value: val }));
@@ -239,7 +236,7 @@ app.get('/', (req, res) => {
                         return;
                     }
 
-                    let safeDepth = currentDepth > 6 ? 6 : currentDepth; // حماية لو في مستويات أعمق
+                    let safeDepth = currentDepth > 6 ? 6 : currentDepth;
 
                     items.forEach((item) => {
                         const card = document.createElement('div');
@@ -248,13 +245,11 @@ app.get('/', (req, res) => {
                         let isVideo = false;
                         let videoUrl = null;
                         
-                        // التحقق هل ده فيديو نهائي؟
                         if (typeof item.value === 'string' && (item.value.includes('http') || item.value.includes('mp4'))) {
                             isVideo = true; videoUrl = item.value;
                         } else if (item.value && (item.value.video_url || item.value.link)) {
                             isVideo = true; videoUrl = item.value.video_url || item.value.link;
                         } else if (safeDepth === 6) { 
-                            // لو وصلنا للمستوى السابع (الفيديوهات)
                             isVideo = true; videoUrl = item.value; 
                         }
 
@@ -264,7 +259,6 @@ app.get('/', (req, res) => {
                         let img = (item.value && (item.value.image_url || item.value.image)) ? item.value.image_url || item.value.image : null;
 
                         if (isVideo) {
-                            // 🎬 كارت الفيديو
                             card.innerHTML = \`
                                 \${img ? \`<img src="\${img}">\` : \`<div class="card-icon"><i class="fas fa-play-circle"></i></div>\`}
                                 <h3>\${titleText}</h3>
@@ -272,7 +266,6 @@ app.get('/', (req, res) => {
                             \`;
                             card.onclick = () => openPlayer(videoUrl, titleText);
                         } else {
-                            // 📁 كارت المجلدات (السنين، المواد، المدرسين...)
                             card.innerHTML = \`
                                 \${img ? \`<img src="\${img}">\` : \`<div class="card-icon"><i class="fas \${iconClass}"></i></div>\`}
                                 <h3>\${titleText}</h3>
@@ -288,14 +281,21 @@ app.get('/', (req, res) => {
                     });
                 }
 
-                // ==========================================
-                // مشغل الفيديو السينمائي
-                // ==========================================
                 function openPlayer(url, title) {
                     const modal = document.getElementById('cinemaModal');
                     const wrapper = document.getElementById('playerWrapper');
                     document.getElementById('cinemaTitle').innerText = title;
                     
-                    wrapper.innerHTML = ''; // تنظيف القديم
+                    wrapper.innerHTML = ''; 
                     
-                    if (ty
+                    if (typeof url === 'object') url = url.video_url || url.link || Object.values(url)[0]; 
+                    
+                    if (url && (url.includes('youtube') || url.includes('iframe'))) {
+                        wrapper.innerHTML = \`<iframe src="\${url}" allowfullscreen allow="autoplay; encrypted-media"></iframe>\`;
+                    } else if (url) {
+                        wrapper.innerHTML = \`<video controls autoplay controlsList="nodownload"><source src="\${url}"></video>\`;
+                    } else {
+                        wrapper.innerHTML = \`<h3 style="color:white; margin-top: 20%; text-align:center;">رابط الفيديو غير صالح</h3>\`;
+                    }
+                    
+                   
