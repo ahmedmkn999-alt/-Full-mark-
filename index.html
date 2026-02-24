@@ -65,7 +65,6 @@
         
         .loading-container { text-align: center; margin-top: 50px; }
         .loading-text { color: var(--icy-green); font-size: 1.5em; text-shadow: 0 0 10px var(--glow); }
-        .loading-sub { color: #aaa; font-size: 0.9em; margin-top: 10px; }
     </style>
 </head>
 <body oncontextmenu="return false;">
@@ -111,8 +110,7 @@
     <div class="controls-bar" id="controls-bar"></div>
     <div id="main-content">
         <div class="loading-container" id="loadingBox">
-            <div class="loading-text"><i class="fas fa-spinner fa-spin"></i> جاري سحب البيانات... ⏳</div>
-            <div class="loading-sub" id="loadingSub">نبحث عن أفضل مسار آمن لسحب المحتوى...</div>
+            <div class="loading-text"><i class="fas fa-spinner fa-spin"></i> جاري سحب البيانات بشكل آمن... ⏳</div>
         </div>
     </div>
 
@@ -123,7 +121,7 @@
     </div>
 
     <script>
-        // 1. النجوم
+        // النجوم
         const starsContainer = document.getElementById('stars');
         for(let i=0; i<80; i++) {
             let star = document.createElement('div'); star.className = 'star';
@@ -135,7 +133,7 @@
 
         function toggleProfile() { document.getElementById('profileSidebar').classList.toggle('open'); }
 
-        // 2. العداد
+        // العداد
         const countDownDate = new Date("Jun 1, 2026 00:00:00").getTime();
         setInterval(function() {
             const now = new Date().getTime();
@@ -152,43 +150,20 @@
 
         const mainContent = document.getElementById('main-content');
         const controlsBar = document.getElementById('controls-bar');
-        const loadingSub = document.getElementById('loadingSub');
         let historyStack = [];
 
-        // 3. كود السحب الذكي (بيجرب 4 طرق مختلفة عشان يضمن نجاح السحب)
-        const targetUrl = 'https://thanwyaplus.vercel.app/organized_output.json';
-        const proxyList = [
-            targetUrl, // محاولة مباشرة
-            \`/api/data\`, // محاولة عبر Vercel Rewrite
-            \`https://corsproxy.io/?\${encodeURIComponent(targetUrl)}\`, // كوبري 1
-            \`https://api.allorigins.win/raw?url=\${encodeURIComponent(targetUrl)}\`, // كوبري 2
-            \`https://api.codetabs.com/v1/proxy?quest=\${targetUrl}\` // كوبري 3
-        ];
-
-        async function fetchWithFallback(proxies) {
-            for (let i = 0; i < proxies.length; i++) {
-                try {
-                    loadingSub.innerText = \`محاولة الاتصال بالمسار (\${i + 1}/\${proxies.length})...\`;
-                    let res = await fetch(proxies[i]);
-                    if (res.ok) {
-                        return await res.json();
-                    }
-                } catch (e) {
-                    console.warn("فشل المسار: ", proxies[i]);
-                }
-            }
-            throw new Error("فشلت جميع طرق الاتصال");
-        }
-
-        // تشغيل السحب الذكي
-        fetchWithFallback(proxyList)
+        // 🔴 هنا السحر: السحب بيتم من السيرفر الأصلي بتاعنا مباشرة وبدون بروكسي
+        fetch('/api/data')
+            .then(res => {
+                if(!res.ok) throw new Error("Network response was not ok");
+                return res.json();
+            })
             .then(data => { renderView(data, 0, "الرئيسية"); })
             .catch(err => { 
-                mainContent.innerHTML = '<h3 style="text-align:center; color:#ff4d4d;">حدث خطأ في الاتصال بالخادم.. تأكد من قوة الإنترنت وقم بتحديث الصفحة.</h3>'; 
-                console.error(err);
+                mainContent.innerHTML = '<h3 style="text-align:center; color:#ff4d4d;">حدث خطأ في السحب.. برجاء إعادة تحديث الصفحة!</h3>'; 
+                console.error("Fetch error:", err);
             });
 
-        // 4. دالة العرض وبناء المنصة
         function renderView(dataObject, currentDepth, currentTitle) {
             mainContent.innerHTML = ''; 
             controlsBar.innerHTML = '';
