@@ -55,7 +55,7 @@ app.get('/', (req, res) => {
                 h1 { color: var(--icy-green); text-shadow: 0 0 15px var(--glow); margin: 0; font-size: 3em; }
                 p.subtitle { color: #d1f2e0; font-size: 1.1em; margin-top: 10px; }
                 
-                /* شبكة الكروت (الفولدرات أو الفيديوهات) */
+                /* شبكة الكروت */
                 .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 30px; padding: 40px; max-width: 1300px; margin: auto; }
                 .card { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(168, 255, 210, 0.15); border-radius: 20px; padding: 20px; text-align: center; transition: all 0.4s ease; position: relative; }
                 .card:hover { transform: translateY(-10px); border-color: var(--icy-green); box-shadow: 0 10px 30px rgba(0, 255, 136, 0.2); }
@@ -65,8 +65,6 @@ app.get('/', (req, res) => {
                 /* زرار الرجوع */
                 .back-btn { display: block; margin: 20px auto; padding: 12px 30px; background: var(--icy-green); color: #05130d; font-weight: bold; font-size: 1.2em; border: none; border-radius: 10px; cursor: pointer; transition: 0.3s; box-shadow: 0 0 15px rgba(0,255,136,0.3); }
                 .back-btn:hover { background: var(--glow); transform: scale(1.05); }
-                
-                .loading { text-align: center; font-size: 1.5em; color: var(--icy-green); margin-top: 50px; }
             </style>
         </head>
         <body oncontextmenu="return false;">
@@ -76,7 +74,6 @@ app.get('/', (req, res) => {
                 <p class="subtitle">طريقك للعلامة الكاملة بأسلوب مبتكر</p>
             </header>
             
-            <div id="loading" class="loading">جاري ترتيب المحتوى... ⏳</div>
             <div id="main-content"></div>
 
             <script>
@@ -91,27 +88,23 @@ app.get('/', (req, res) => {
                 }
 
                 const mainContent = document.getElementById('main-content');
-                const loadingDiv = document.getElementById('loading');
-                
-                let historyStack = []; // لتخزين مسار الصفحات للرجوع للخلف
+                let historyStack = [];
 
-                // جلب البيانات الأساسية
+                // جلب البيانات بدون رسالة تحميل
                 fetch('/api/scrape')
                     .then(res => res.json())
                     .then(data => {
-                        loadingDiv.style.display = 'none';
                         let items = Array.isArray(data) ? data : (data.data || Object.values(data));
                         renderView(items);
                     })
                     .catch(err => {
-                        loadingDiv.innerHTML = '<span style="color:red;">حدث خطأ في تحميل البيانات!</span>';
+                        mainContent.innerHTML = '<h3 style="color:red; text-align:center;">حدث خطأ في تحميل البيانات!</h3>';
                     });
 
-                // دالة ذكية لعرض المجلدات أو الفيديوهات
+                // دالة عرض المجلدات أو الفيديوهات
                 function renderView(items) {
                     mainContent.innerHTML = ''; 
 
-                    // إضافة زرار الرجوع لو إحنا جوا مجلد
                     if (historyStack.length > 0) {
                         const backBtn = document.createElement('button');
                         backBtn.className = 'back-btn';
@@ -133,7 +126,6 @@ app.get('/', (req, res) => {
                     }
 
                     items.forEach((item, index) => {
-                        // لو العنصر كان نص مش مجسم، هنحوله
                         if(typeof item !== 'object') { item = { title: 'محتوى', video_url: item }; }
 
                         const card = document.createElement('div');
@@ -141,17 +133,16 @@ app.get('/', (req, res) => {
                         
                         let titleText = item.title || item.name || \`عنصر رقم \${index + 1}\`;
                         
-                        // البحث عن مصفوفة داخل العنصر (عشان نعرف إذا كان مجلد ولا فيديو)
                         let nestedData = null;
                         for (let key in item) {
                             if (Array.isArray(item[key]) && item[key].length > 0) {
-                                nestedData = item[key]; // لقينا فيديوهات جواه
+                                nestedData = item[key];
                                 break;
                             }
                         }
 
                         if (nestedData) {
-                            // 📁 ده مجلد (زي 2026 و 2025)
+                            // 📁 مجلد
                             let img = item.image_url || item.image || item.thumbnail || 'https://via.placeholder.com/400x300/05130d/a8ffd2?text=Folder';
                             card.innerHTML = \`
                                 <img src="\${img}" alt="مجلد">
@@ -160,11 +151,11 @@ app.get('/', (req, res) => {
                             \`;
                             card.style.cursor = 'pointer';
                             card.onclick = () => {
-                                historyStack.push(items); // حفظ الصفحة الحالية
-                                renderView(nestedData);   // فتح المجلد
+                                historyStack.push(items); 
+                                renderView(nestedData);   
                             };
                         } else {
-                            // 🎬 ده فيديو أو صورة نهائية
+                            // 🎬 فيديو أو صورة
                             let videoUrl = item.video_url || item.video || item.link;
                             let imageUrl = item.image_url || item.image || item.thumbnail;
                             
@@ -199,3 +190,4 @@ app.get('/', (req, res) => {
 });
 
 module.exports = app;
+              
