@@ -150,11 +150,16 @@
         const controlsBar = document.getElementById('controls-bar');
         let historyStack = [];
 
-        // هنا السحر: هنسحب من الرابط السحري اللي عملناه في vercel.json
-        fetch('/api/data')
+        // السحر هنا: استخدام كوبري خارجي عشان نتخطى مشكلة الحماية ونسحب الداتا مباشرة من المتصفح!
+        const targetDataUrl = encodeURIComponent('https://thanwyaplus.vercel.app/organized_output.json');
+        
+        fetch(\`https://api.allorigins.win/raw?url=\${targetDataUrl}\`)
             .then(res => res.json())
             .then(data => { renderView(data, 0, "الرئيسية"); })
-            .catch(err => { mainContent.innerHTML = '<h3 style="text-align:center; color:#ff4d4d;">حدث خطأ في تحميل البيانات! تأكد إن ملف vercel.json موجود ومكتوب صح.</h3>'; console.error(err);});
+            .catch(err => { 
+                mainContent.innerHTML = '<h3 style="text-align:center; color:#ff4d4d;">حدث خطأ في جلب البيانات، يرجى تحديث الصفحة.</h3>'; 
+                console.error(err);
+            });
 
         function renderView(dataObject, currentDepth, currentTitle) {
             mainContent.innerHTML = ''; 
@@ -274,5 +279,4 @@
         }
     </script>
 </body>
-  </html>
-  
+</html>
